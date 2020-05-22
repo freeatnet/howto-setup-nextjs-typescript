@@ -1,0 +1,8 @@
+on:
+  schedule:
+
+jobs:
+  setup:
+    steps:
+    - name: Create a new Next.js app
+      run: yarn create next-app nextjs-typescript-app --example default
