@@ -9,24 +9,24 @@ jobs:
     - uses: actions/checkout@v2
       with:
         ref: ${{ github.head_ref }}
-    - name: Create a new Next.js app
-      run: yarn create next-app new-next-app --example ''
+    - name: Create a new Next.js app named 'example-app'
+      run: yarn create next-app example-app --example ''
     - name: Start TypeScript conversion by creating `tsconfig.json`
       run: touch tsconfig.json
-      working-directory: ./new-next-app
+      working-directory: ./example-app
     - name: Find out TypeScript dependencies from next dev
       run: echo "##[set-output name=deps_command;]$(yarn dev 2>&1 | grep 'yarn add' | xargs)"
       id: get_dependencies_command
-      working-directory: ./new-next-app
+      working-directory: ./example-app
     - name: Install TypeScript dependencies!
       run: ${{steps.get_dependencies_command.outputs.deps_command}}
-      working-directory: ./new-next-app
+      working-directory: ./example-app
     - name: Rename default page and api files to TypeScript extension `.tsx`
       run: mv pages/index.{js,tsx} && mv pages/api/hello.{js,tsx}
-      working-directory: ./new-next-app
+      working-directory: ./example-app
     - name: Start `next dev`
       run: (timeout 15 yarn dev | tee output.log) || true; grep "compiled successfully" output.log
-      working-directory: ./new-next-app
+      working-directory: ./example-app
     - name: Commit our new app
       uses: stefanzweifel/git-auto-commit-action@v4.1.6
       with:
@@ -35,7 +35,7 @@ jobs:
         # Optional name of the branch the commit should be pushed to
         # Required if Action is used in Workflow listening to the `pull_request` event.
         # Also required for almost all other events (eg. `schedule`)
-        branch: typescript-next-app
+        branch: master
 
         # Optional glob pattern of files which should be added to the commit
-        file_pattern: new-next-app/
+        file_pattern: example-app/
