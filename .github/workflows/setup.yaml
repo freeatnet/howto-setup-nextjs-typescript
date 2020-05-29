@@ -6,6 +6,9 @@ jobs:
   setup:
     runs-on: ubuntu-latest
     steps:
+    - uses: actions/checkout@v2
+      with:
+        ref: ${{ github.head_ref }}
     - name: Create a new Next.js app
       run: yarn create next-app new-next-app --example ''
     - name: Start TypeScript conversion by creating `tsconfig.json`
