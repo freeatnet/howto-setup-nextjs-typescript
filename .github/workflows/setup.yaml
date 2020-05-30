@@ -11,7 +11,7 @@ jobs:
     - uses: actions/checkout@v2
       with:
         ref: ${{ github.head_ref }}
-    - run: rm -Rf ./example-app
+    - run: (git checkout output || git checkout -b output); git reset --hard origin/master
     - name: Create a new Next.js app named 'example-app'
       run: yarn create next-app example-app --example ''
     - name: Start TypeScript conversion by creating `tsconfig.json`
@@ -38,7 +38,7 @@ jobs:
         # Optional name of the branch the commit should be pushed to
         # Required if Action is used in Workflow listening to the `pull_request` event.
         # Also required for almost all other events (eg. `schedule`)
-        branch: master
+        branch: output
 
         # Optional glob pattern of files which should be added to the commit
         file_pattern: example-app/
