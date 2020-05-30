@@ -85,9 +85,10 @@ jobs:
       run: yarn lint:all --fix
       working-directory: ./with-eslint
 
+    - name: Verify that no linting issues remain
+      run: yarn lint:all --max-warnings=0 # see https://github.com/eslint/eslint/issues/2309#issuecomment-219828044
 
     # TODO:
-    #   2. Verify no errors persist
     #   3. Install husky and lint-staged
 
     - name: Commit our changes
