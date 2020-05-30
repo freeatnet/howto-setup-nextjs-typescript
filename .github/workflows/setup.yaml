@@ -87,9 +87,11 @@ jobs:
 
     - name: Verify that no linting issues remain
       run: yarn lint:all --max-warnings=0 # see https://github.com/eslint/eslint/issues/2309#issuecomment-219828044
+      working-directory: ./with-eslint
 
     - name: Install husky and lint-staged
       run: yarn add -D husky lint-staged
+      working-directory: ./with-eslint
     - name: Add husky and lint-staged configs to package.json
       run: |-
         jq -s '.[0] * .[1]' -- package.json - <<- NEW_SCRIPTS > package.json.new
@@ -107,6 +109,7 @@ jobs:
         }
         NEW_SCRIPTS
         mv package.json.new package.json
+      working-directory: ./with-eslint
 
     - name: Commit our changes
       uses: stefanzweifel/git-auto-commit-action@v4
