@@ -5,7 +5,7 @@ on:
     - '.github/workflows/*'
 
 jobs:
-  setup:
+  create-app:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -31,7 +31,7 @@ jobs:
       run: (timeout 15 yarn dev | tee output.log) || true; grep "compiled successfully" output.log
       working-directory: ./example-app
     - name: Commit our new app
-      uses: stefanzweifel/git-auto-commit-action@v4.1.6
+      uses: stefanzweifel/git-auto-commit-action@v4
       with:
         commit_message: Set up our brand new shiny Next.js TypeScript app
 
@@ -39,6 +39,63 @@ jobs:
         # Required if Action is used in Workflow listening to the `pull_request` event.
         # Also required for almost all other events (eg. `schedule`)
         branch: output
+        push_options: '--force'
 
         # Optional glob pattern of files which should be added to the commit
         file_pattern: example-app/
+  add-linting:
+    needs: [ create-app ]
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        ref: output
+    - run: rm -Rf with-eslint && cp -R example-app with-eslint
+    - name: Install eslint-config-react-app
+      run: yarn add -D eslint-config-react-app
+      working-directory: ./with-eslint
+    - name: Install eslint-config-react-app's peer dependencies
+      run: |-
+        curl --silent https://raw.githubusercontent.com/facebook/create-react-app/master/packages/eslint-config-react-app/package.json \
+          | jq .peerDependencies \
+          | jq -r 'to_entries|map("\(.key)@\(.value|tostring)")|.[]'  \
+          | xargs -I {} echo -n "\"{}\" " \
+          | xargs yarn add -D
+      working-directory: ./with-eslint
+    - name: Install prettier & eslint-config-prettier
+      run: yarn add -D eslint-config-prettier eslint-plugin-prettier prettier
+      working-directory: ./with-eslint
+    - name: Add eslint and prettier configs
+      run: cp ../with-eslint-files/.eslintrc.json . && cp ../with-eslint-files/.prettierrc.json .
+      working-directory: ./with-eslint
+    
+    - name: Install eslint scripts
+      run: |-
+        jq -s '.[0] * .[1]' -- package.json - <<- NEW_SCRIPTS > package.json.new
+        {
+          "scripts": {
+          "lint": "eslint --config .eslintrc.json --ext .js,.jsx,.ts,.tsx",
+          "lint:all": "eslint --config .eslintrc.json --ext .js,.jsx,.ts,.tsx ."
+          }
+        }
+        NEW_SCRIPTS
+        mv package.json.new package.json
+      working-directory: ./with-eslint
+    - name: Let's run that new script with an option to automatically fix all fixable lint warnings!
+      run: yarn lint:all --fix
+      working-directory: ./with-eslint
+
+
+    # TODO:
+    #   2. Verify no errors persist
+    #   3. Install husky and lint-staged
+
+    - name: Commit our changes
+      uses: stefanzweifel/git-auto-commit-action@v4
+      with:
+        commit_message: Lint code with eslint
+        
+        branch: output
+        push_options: '--force'
+
+        file_pattern: with-eslint/
