@@ -11,6 +11,7 @@ jobs:
     - uses: actions/checkout@v2
       with:
         ref: ${{ github.head_ref }}
+    - run: rm -Rf ./example-app
     - name: Create a new Next.js app named 'example-app'
       run: yarn create next-app example-app --example ''
     - name: Start TypeScript conversion by creating `tsconfig.json`
