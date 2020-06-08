@@ -117,13 +117,42 @@ jobs:
         NEW_SCRIPTS
         mv package.json.new package.json
       working-directory: ./with-eslint
-
     - name: Commit our changes
       uses: stefanzweifel/git-auto-commit-action@v4
       with:
         commit_message: Lint code with eslint
-        
         branch: output
-        push_options: '--force'
-
         file_pattern: with-eslint/
+
+  with-jest:
+    needs: [ with-eslint ]
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        ref: output
+    - run: rm -Rf with-jest && cp -R with-eslint with-jest
+    - name: Install jest, @testing-library/react, @testing-library/jest-dom, and their TypeScript types.
+      run: yarn add -D jest @testing-library/react @testing-library/jest-dom @types/jest @types/testing-library__jest-dom @types/testing-library__react
+      working-directory: ./with-jest
+    - name: Use babel/next preset with jest by adding .babelrc
+      run: cp with-jest-files/.babelrc with-jest/
+    - name: Set up automatic import of @testing-library/jest-dom helpers
+      run: cp with-jest-files/jest.*.js with-jest/
+    - name: Add `yarn test` command
+      run: |-
+        jq -s '.[0] * .[1]' -- package.json - <<- NEW_SCRIPTS > package.json.new
+        {
+          "scripts": {
+            "test": "jest"
+          }
+        }
+        NEW_SCRIPTS
+        mv package.json.new package.json
+      working-directory: ./with-jest
+    - name: Commit testing setup
+      uses: stefanzweifel/git-auto-commit-action@v4
+      with:
+        commit_message: Add testing with jest
+        branch: output
+        file_pattern: with-jest/
