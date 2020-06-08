@@ -156,3 +156,19 @@ jobs:
         commit_message: Add testing with jest
         branch: output
         file_pattern: with-jest/
+    - name: Install eslint-plugin-jest
+      run: yarn add -D eslint-plugin-jest
+      working-directory: ./with-jest
+    - name: Add plugin:jest/recommended and plugin:jest/style to the `extends` section of .eslintrc.json
+      run: >-
+        jq
+        '. + { plugins: ["jest"] } + {extends: ((.extends | index("plugin:prettier/recommended")) as $insindex | .extends[0:$insindex] + ["plugin:jest/recommended", "plugin:jest/style"] + .extends[$insindex:])}'
+        .eslintrc.json > .eslintrc.json.new;
+        mv .eslintrc.json.new .eslintrc.json
+      working-directory: ./with-jest
+    - name: Commit linting of tests
+      uses: stefanzweifel/git-auto-commit-action@v4
+      with:
+        commit_message: Lint jest tests with eslint-plugin-jest
+        branch: output
+        file_pattern: with-jest/
