@@ -79,7 +79,8 @@ jobs:
     
     - name: Install eslint scripts
       run: |-
-        jq -s '.[0] * .[1]' -- package.json - <<- NEW_SCRIPTS > package.json.new
+        cp package.json{,.bak}
+        jq -s '.[0] * .[1]' -- package.json.bak - <<- NEW_SCRIPTS > package.json
         {
           "scripts": {
           "lint": "eslint --config .eslintrc.json --ext .js,.jsx,.ts,.tsx",
@@ -87,7 +88,8 @@ jobs:
           }
         }
         NEW_SCRIPTS
-        mv package.json.new package.json
+        diff package.json{.bak,} || true
+        rm package.json.bak
       working-directory: ./with-eslint
     - name: Let's run that new script with an option to automatically fix all fixable lint warnings!
       run: yarn lint:all --fix
@@ -102,7 +104,8 @@ jobs:
       working-directory: ./with-eslint
     - name: Add husky and lint-staged configs to package.json
       run: |-
-        jq -s '.[0] * .[1]' -- package.json - <<- NEW_SCRIPTS > package.json.new
+        cp package.json{,.bak}
+        jq -s '.[0] * .[1]' -- package.json.bak - <<- NEW_SCRIPTS > package.json
         {
           "husky": {
             "hooks": {
@@ -116,7 +119,8 @@ jobs:
           }
         }
         NEW_SCRIPTS
-        mv package.json.new package.json
+        diff package.json{.bak,} || true
+        rm package.json.bak
       working-directory: ./with-eslint
     - name: Commit our changes
       uses: stefanzweifel/git-auto-commit-action@v4
@@ -142,14 +146,16 @@ jobs:
       run: cp with-jest-files/jest.*.js with-jest/
     - name: Add `yarn test` command
       run: |-
-        jq -s '.[0] * .[1]' -- package.json - <<- NEW_SCRIPTS > package.json.new
+        cp package.json{,.bak}
+        jq -s '.[0] * .[1]' -- package.json.bak - <<- NEW_SCRIPTS > package.json
         {
           "scripts": {
             "test": "jest"
           }
         }
         NEW_SCRIPTS
-        mv package.json.new package.json
+        diff package.json{.bak,} || true
+        rm package.json.bak
       working-directory: ./with-jest
     - name: Commit testing setup
       uses: stefanzweifel/git-auto-commit-action@v4
@@ -162,10 +168,12 @@ jobs:
       working-directory: ./with-jest
     - name: Add plugin:jest/recommended and plugin:jest/style to the `extends` section of .eslintrc.json
       run: >-
+        cp .eslintrc.json{,.bak};
         jq
         '. + { plugins: ["jest"] } + {extends: ((.extends | index("plugin:prettier/recommended")) as $insindex | .extends[0:$insindex] + ["plugin:jest/recommended", "plugin:jest/style"] + .extends[$insindex:])}'
-        .eslintrc.json > .eslintrc.json.new;
-        mv .eslintrc.json.new .eslintrc.json
+        .eslintrc.json.bak > .eslintrc.json;
+        diff .eslintrc.json{.bak,} || true;
+        rm .eslintrc.json.bak
       working-directory: ./with-jest
     - name: Commit linting of tests
       uses: stefanzweifel/git-auto-commit-action@v4
