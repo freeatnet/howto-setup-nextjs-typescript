@@ -137,6 +137,10 @@ jobs:
       with:
         ref: output
     - run: rm -Rf with-jest && cp -R with-eslint with-jest
+
+    ##
+    # PART 1: Install jest and react testing library (plus jest-dom helpers)
+    #
     - name: Install jest, @testing-library/react, @testing-library/jest-dom, and their TypeScript types.
       run: yarn add -D jest @testing-library/react @testing-library/jest-dom @types/jest @types/testing-library__jest-dom @types/testing-library__react
       working-directory: ./with-jest
@@ -157,12 +161,49 @@ jobs:
         diff -y package.json{.bak,} || true
         rm package.json.bak
       working-directory: ./with-jest
+    # TODO: Add a sample test and run it to verify that jest is set up correctly.
     - name: Commit testing setup
       uses: stefanzweifel/git-auto-commit-action@v4
       with:
         commit_message: Add testing with jest
         branch: output
         file_pattern: with-jest/
+
+    ##
+    # PART 2: Since jest in this configuration won't type check, set up scripts to run type checks
+    #
+    - name: Configure lint-staged to run type
+      run: cp with-jest-files/lint-staged.config.js with-jest/
+    - name: Add `yarn check-types` command
+      run: |-
+        cp package.json{,.bak}
+        jq -s '.[0] * .[1]' -- package.json.bak - <<- NEW_SCRIPTS > package.json
+        {
+          "scripts": {
+            "check-types": "tsc --pretty --noEmit"
+          }
+        }
+        NEW_SCRIPTS
+        diff -y package.json{.bak,} || true
+        rm package.json.bak
+      working-directory: ./with-jest
+    - name: Remove `lint-staged` directive from package.json 
+      run: |-
+        cp package.json{,.bak}
+        jq 'del(."lint-staged")' package.json.bak > package.json
+        diff -y package.json{.bak,} || true
+        rm package.json.bak
+      working-directory: ./with-jest
+    - name: Commit pre-commit type check hook
+      uses: stefanzweifel/git-auto-commit-action@v4
+      with:
+        commit_message: Trigger type check on pre-commit hook
+        branch: output
+        file_pattern: with-jest/
+
+    ##
+    # PART 3: Add linting rules for jest tests
+    #
     - name: Install eslint-plugin-jest
       run: yarn add -D eslint-plugin-jest
       working-directory: ./with-jest
