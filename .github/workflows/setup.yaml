@@ -196,7 +196,6 @@ jobs:
         diff -y package.json{.bak,} || true
         rm package.json.bak
       working-directory: ./with-jest
-    # TODO: Add a sample test and run it to verify that jest is set up correctly.
     - name: Commit testing setup
       uses: stefanzweifel/git-auto-commit-action@v4
       with:
@@ -257,3 +256,19 @@ jobs:
         commit_message: Lint jest tests with eslint-plugin-jest
         branch: output
         file_pattern: with-jest/
+
+    ##
+    # PART 4: Add a sample test and run jest
+    #
+    - name: Add a sample test
+      run: cp -R with-jest-files/__tests__ with-jest/
+    - name: Run jest!
+      run: yarn jest
+      working-directory: ./with-jest
+    - name: Commit sample test
+      uses: stefanzweifel/git-auto-commit-action@v4
+      with:
+        commit_message: Add a sample test for home page
+        branch: output
+        file_pattern: with-jest/
+    
