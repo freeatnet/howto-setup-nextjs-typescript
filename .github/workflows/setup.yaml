@@ -12,6 +12,7 @@ jobs:
     - name: (docs skip) Clear output
       run: (git checkout output || git checkout -b output); git reset --hard origin/master; git push --force origin output
   create-app:
+    needs: [ reset-output ]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
