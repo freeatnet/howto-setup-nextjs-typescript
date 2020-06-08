@@ -35,6 +35,8 @@ jobs:
     - name: Start `next dev`
       run: (timeout 15 yarn dev | tee output.log) || true; grep "compiled successfully" output.log
       working-directory: ./example-app
+    - name: (docs skip) Remove technical file output.log
+      run: rm example-app/output.log
     - name: Commit our new app
       uses: stefanzweifel/git-auto-commit-action@v4
       with:
