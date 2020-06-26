@@ -84,8 +84,8 @@ jobs:
     - name: (docs skip) yarn install
       run: yarn install
       working-directory: ./with-eslint
-    - name: Install eslint-config-react-app
-      run: yarn add -D eslint-config-react-app
+    - name: "Install eslint-config-react-app (FIXME: using an unreleased version of `eslint-config-react-app` that supports ESLint 7)"
+      run: yarn add -D https://gitpkg.now.sh/facebook/create-react-app/packages/eslint-config-react-app?6223fd98c2c8abf4fa7320e048ec62ab0bb8941c
       working-directory: ./with-eslint
     - name: Install eslint-config-react-app's peer dependencies
       run: |-
