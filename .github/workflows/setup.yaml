@@ -43,9 +43,18 @@ jobs:
     - name: Install TypeScript dependencies!
       run: ${{steps.get_dependencies_command.outputs.deps_command}}
       working-directory: ./example-app
-    - name: Rename default page and api files to TypeScript extension `.tsx`
-      run: mv pages/index.{js,tsx} && mv pages/api/hello.{js,tsx}
-      working-directory: ./example-app
+    #
+    # NOTE: This no longer works; import/no-anonymous-default-export and 
+    #       @typescript-eslint/explicit-module-boundary-types rules fail
+    #       direct translation.
+    #
+    # - name: Rename default page and api files to TypeScript extension `.tsx`
+    #   run: mv pages/index.{js,tsx} && mv pages/api/hello.{js,tsx}
+    #   working-directory: ./example-app
+    - name: Replace JavaScript files with TypeScript
+      run: |-
+        rm example-app/pages/api/hello.js 
+        cp create-app-files/app/pages/api/hello.tsx example-app/pages/api/hello.tsx
     - name: Start `next dev`
       run: (timeout 15 yarn dev | tee output.log) || true; grep "compiled successfully" output.log
       working-directory: ./example-app
