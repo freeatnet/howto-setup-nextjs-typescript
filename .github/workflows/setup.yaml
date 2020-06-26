@@ -89,7 +89,7 @@ jobs:
       working-directory: ./with-eslint
     - name: Install eslint-config-react-app's peer dependencies
       run: |-
-        curl --silent https://raw.githubusercontent.com/facebook/create-react-app/master/packages/eslint-config-react-app/package.json \
+        curl --silent https://raw.githubusercontent.com/facebook/create-react-app/6223fd98c2c8abf4fa7320e048ec62ab0bb8941c/packages/eslint-config-react-app/package.json \
           | jq .peerDependencies \
           | jq -r 'to_entries|map("\(.key)@\(.value|tostring)")|.[]'  \
           | xargs -I {} echo -n "\"{}\" " \
