@@ -54,7 +54,7 @@ jobs:
     - name: Replace JavaScript files with TypeScript
       run: |-
         cp -R create-app-files/app/pages example-app/
-        rm example-app/pages/index.js example-app/pages/api/hello.js
+        rm example-app/pages/*.js example-app/pages/api/*.js
     - name: Start `next dev`
       run: (timeout 15 yarn dev | tee output.log) || true; grep "compiled successfully" output.log
       working-directory: ./example-app
