@@ -195,6 +195,8 @@ jobs:
       run: cp with-jest-files/.babelrc with-jest/
     - name: Set up automatic import of @testing-library/jest-dom helpers
       run: cp with-jest-files/jest.*.js with-jest/
+    - name: Stub out CSS imports (see https://jestjs.io/docs/en/webpack#handling-static-assets)
+      run: cp -R with-jest-files/__mocks__ with-jest/
     - name: Add `yarn test` command
       run: |-
         cp package.json{,.bak}
