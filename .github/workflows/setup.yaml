@@ -244,15 +244,15 @@ jobs:
 
     ##
     # PART 3: Add linting rules for jest tests
-    #
+    # See https://www.npmjs.com/package/eslint-config-react-app#jest-rules for details
     - name: Install eslint-plugin-jest
-      run: yarn add -D eslint-plugin-jest
+      run: yarn add -D eslint-plugin-jest@^24.0.0 eslint-plugin-testing-library@^3.9.0
       working-directory: ./with-jest
     - name: Add plugin:jest/recommended and plugin:jest/style to the `extends` section of .eslintrc.json
       run: >-
         cp .eslintrc.json{,.bak};
         jq
-        '. + { plugins: ["jest"] } + {extends: ((.extends | index("plugin:prettier/recommended")) as $insindex | .extends[0:$insindex] + ["plugin:jest/recommended", "plugin:jest/style"] + .extends[$insindex:])}'
+        '. + { plugins: ["jest"] } + {extends: ((.extends | index("plugin:@typescript-eslint/recommended")) as $insindex | .extends[0:$insindex] + ["react-app/jest", "plugin:jest/style"] + .extends[$insindex:])}'
         .eslintrc.json.bak > .eslintrc.json;
         diff -y .eslintrc.json{.bak,} || true;
         rm .eslintrc.json.bak
