@@ -1,9 +1,9 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
-import { NextApiHandler, NextApiRequest, NextApiResponse } from 'next'
+import { NextApiHandler } from 'next';
 
-const handler: NextApiHandler = (req: NextApiRequest, res: NextApiResponse) => {
-  res.statusCode = 200
-  res.json({ name: 'John Doe' })
-}
+const handler: NextApiHandler = (req, res) => {
+  res.statusCode = 200;
+  res.json({ name: 'John Doe' });
+};
 
-export default handler
+export default handler;

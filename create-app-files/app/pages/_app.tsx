@@ -1,10 +1,9 @@
-import { AppProps } from 'next/app'
+import { AppProps } from 'next/app';
 
-import '../styles/globals.css'
+import '../styles/globals.css';
 
-// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-const MyApp = ({ Component, pageProps }: AppProps) => {
-  return <Component {...pageProps} />
+function MyApp({ Component, pageProps }: AppProps): JSX.Element {
+  return <Component {...pageProps} />;
 }
 
-export default MyApp
+export default MyApp;
