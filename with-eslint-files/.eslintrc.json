@@ -1,20 +1,21 @@
 {
   "extends": [
-    "plugin:@typescript-eslint/recommended",
+    "eslint:recommended",
     "react-app",
-    "plugin:prettier/recommended",
-    "prettier/@typescript-eslint"
+    "plugin:@typescript-eslint/recommended",
+    "prettier/@typescript-eslint",
+    "prettier/react",
+    "plugin:prettier/recommended"
   ],
   "rules": {
-    "@typescript-eslint/explicit-function-return-type": "off",
-    "@typescript-eslint/no-explicit-any": "warn",
-    "@typescript-eslint/ban-ts-ignore": "off",
     "import/order": [
       "error",
       {
         "groups": [
-          "builtin",
-          "external",
+          [
+            "builtin",
+            "external"
+          ],
           "internal",
           "parent",
           "sibling",
