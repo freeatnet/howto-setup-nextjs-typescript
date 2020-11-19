@@ -94,16 +94,9 @@ jobs:
     - name: (docs skip) yarn install
       run: yarn install
       working-directory: ./with-eslint
-    - name: "Install eslint-config-react-app (FIXME: using an unreleased version of `eslint-config-react-app` that supports ESLint 7)"
-      run: yarn add -D https://gitpkg.now.sh/facebook/create-react-app/packages/eslint-config-react-app?14b78680ffe4357f379b83f51682f3c2075eb987
-      working-directory: ./with-eslint
-    - name: Install eslint-config-react-app's peer dependencies
-      run: |-
-        curl --silent https://raw.githubusercontent.com/facebook/create-react-app/14b78680ffe4357f379b83f51682f3c2075eb987/packages/eslint-config-react-app/package.json \
-          | jq .peerDependencies \
-          | jq -r 'to_entries|map("\(.key)@\(.value|tostring)")|.[]'  \
-          | xargs -I {} echo -n "\"{}\" " \
-          | xargs yarn add -D
+    - name: "Install eslint-config-react-app and its peer dependencies"
+      # See https://www.npmjs.com/package/eslint-config-react-app#usage-outside-of-create-react-app for the up-to-date list
+      run: yarn add -D eslint-config-react-app @typescript-eslint/eslint-plugin@^4.0.0 @typescript-eslint/parser@^4.0.0 babel-eslint@^10.0.0 eslint@^7.5.0 eslint-plugin-flowtype@^5.2.0 eslint-plugin-import@^2.22.0 eslint-plugin-jsx-a11y@^6.3.1 eslint-plugin-react@^7.20.3 eslint-plugin-react-hooks@^4.0.8
       working-directory: ./with-eslint
     - name: Install prettier & eslint-config-prettier
       run: yarn add -D eslint-config-prettier eslint-plugin-prettier prettier
