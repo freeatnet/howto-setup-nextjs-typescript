@@ -6,6 +6,7 @@ on:
     paths:
     - '.github/workflows/*'
     - '*-files/*'
+  workflow_dispatch:
 
 jobs:
   reset-output:
