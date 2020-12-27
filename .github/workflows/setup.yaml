@@ -15,6 +15,10 @@ jobs:
     - uses: actions/checkout@v2
     - name: (docs skip) Clear output
       run: (git checkout output || git checkout -b output); git reset --hard origin/master; git push --force origin output
+
+  ##
+  # CHAPTER 1. Set up a TypeScript Next.js app.
+  #
   create-app:
     needs: [ reset-output ]
     runs-on: ubuntu-latest
@@ -44,14 +48,6 @@ jobs:
     - name: Install TypeScript dependencies!
       run: ${{steps.get_dependencies_command.outputs.deps_command}}
       working-directory: ./example-app
-    #
-    # NOTE: This no longer works; import/no-anonymous-default-export and 
-    #       @typescript-eslint/explicit-module-boundary-types rules fail
-    #       direct translation.
-    #
-    # - name: Rename default page and api files to TypeScript extension `.tsx`
-    #   run: mv pages/index.{js,tsx} && mv pages/api/hello.{js,tsx}
-    #   working-directory: ./example-app
     - name: Replace JavaScript files with TypeScript
       run: |-
         cp -R create-app-files/app/pages example-app/
@@ -61,6 +57,36 @@ jobs:
       working-directory: ./example-app
     - name: (docs skip) Remove technical file output.log
       run: rm example-app/output.log
+    - name: Enable TypeScript strict mode
+      run: |-
+        cp tsconfig.json{,.bak}
+        jq -s '.[0] * .[1]' -- tsconfig.json.bak - <<- NEW_SCRIPTS > tsconfig.json
+        {
+          "strict": true
+        }
+        NEW_SCRIPTS
+        diff -y tsconfig.json{.bak,} || true
+        rm tsconfig.json.bak
+      working-directory: ./example-app
+    - name: Add `yarn check-types` command
+      run: |-
+        cp package.json{,.bak}
+        jq -s '.[0] * .[1]' -- package.json.bak - <<- NEW_SCRIPTS > package.json
+        {
+          "scripts": {
+            "check-types": "tsc --pretty --noEmit"
+          }
+        }
+        NEW_SCRIPTS
+        diff -y package.json{.bak,} || true
+        rm package.json.bak
+      working-directory: ./example-app
+    - name: Commit pre-commit type check hook
+      uses: stefanzweifel/git-auto-commit-action@v4
+      with:
+        commit_message: Trigger type check on pre-commit hook
+        branch: output
+        file_pattern: with-jest/
     - name: Commit our new app
       uses: stefanzweifel/git-auto-commit-action@v4
       with:
@@ -74,6 +100,10 @@ jobs:
 
         # Optional glob pattern of files which should be added to the commit
         file_pattern: example-app/
+
+  ##
+  # CHAPTER 2. Set up ESLint and type-checking
+  #
   with-eslint:
     needs: [ create-app ]
     runs-on: ubuntu-latest
@@ -111,26 +141,29 @@ jobs:
         jq -s '.[0] * .[1]' -- package.json.bak - <<- NEW_SCRIPTS > package.json
         {
           "scripts": {
-          "lint": "eslint --config .eslintrc.json --ext .js,.jsx,.ts,.tsx",
-          "lint:all": "eslint --config .eslintrc.json --ext .js,.jsx,.ts,.tsx ."
+          "lint": "eslint",
+          "lint:fix": "eslint --fix",
+          "lint:fix:all": "eslint --fix .",
+          "lint:ci": "eslint --max-warnings=0",
+          "lint:ci:all": "eslint --max-warnings=0 ."
           }
         }
         NEW_SCRIPTS
         diff -y package.json{.bak,} || true
         rm package.json.bak
       working-directory: ./with-eslint
-    - name: Let's run that new script with an option to automatically fix all fixable lint warnings!
-      run: yarn lint:all --fix
-      working-directory: ./with-eslint
 
+    - name: Let's run that new script with an option to automatically fix all fixable lint warnings!
+      run: yarn lint:fix:all
+      working-directory: ./with-eslint
     - name: Verify that no linting issues remain
-      run: yarn lint:all --max-warnings=0 # see https://github.com/eslint/eslint/issues/2309#issuecomment-219828044
+      run: yarn lint:ci:all --max-warnings=0
       working-directory: ./with-eslint
 
     - name: Install husky and lint-staged
       run: yarn add -D husky lint-staged
       working-directory: ./with-eslint
-    - name: Add husky and lint-staged configs to package.json
+    - name: Add husky config to package.json.
       run: |-
         cp package.json{,.bak}
         jq -s '.[0] * .[1]' -- package.json.bak - <<- NEW_SCRIPTS > package.json
@@ -139,17 +172,16 @@ jobs:
             "hooks": {
               "pre-commit": "lint-staged"
             }
-          },
-          "lint-staged": {
-            "*.{js,ts,tsx}": [
-              "yarn lint --quiet --fix"
-            ]
           }
         }
         NEW_SCRIPTS
         diff -y package.json{.bak,} || true
         rm package.json.bak
       working-directory: ./with-eslint
+
+    - name: Configure lint-staged to run yarn lint and type-check
+      run: cp with-eslint-files/lint-staged.config.js with-eslint/
+
     - name: Commit our changes
       uses: stefanzweifel/git-auto-commit-action@v4
       with:
@@ -157,6 +189,9 @@ jobs:
         branch: output
         file_pattern: with-eslint/
 
+  ##
+  # CHAPTER 3. Add testing with react-testing-library and Jest.
+  #
   with-jest:
     needs: [ with-eslint ]
     runs-on: ubuntu-latest
@@ -212,39 +247,7 @@ jobs:
         file_pattern: with-jest/
 
     ##
-    # PART 2: Since jest in this configuration won't type check, set up scripts to run type checks
-    #
-    - name: Configure lint-staged to run type
-      run: cp with-jest-files/lint-staged.config.js with-jest/
-    - name: Add `yarn check-types` command
-      run: |-
-        cp package.json{,.bak}
-        jq -s '.[0] * .[1]' -- package.json.bak - <<- NEW_SCRIPTS > package.json
-        {
-          "scripts": {
-            "check-types": "tsc --pretty --noEmit"
-          }
-        }
-        NEW_SCRIPTS
-        diff -y package.json{.bak,} || true
-        rm package.json.bak
-      working-directory: ./with-jest
-    - name: Remove `lint-staged` directive from package.json 
-      run: |-
-        cp package.json{,.bak}
-        jq 'del(."lint-staged")' package.json.bak > package.json
-        diff -y package.json{.bak,} || true
-        rm package.json.bak
-      working-directory: ./with-jest
-    - name: Commit pre-commit type check hook
-      uses: stefanzweifel/git-auto-commit-action@v4
-      with:
-        commit_message: Trigger type check on pre-commit hook
-        branch: output
-        file_pattern: with-jest/
-
-    ##
-    # PART 3: Add linting rules for jest tests
+    # PART 2: Add linting rules for jest tests
     # See https://www.npmjs.com/package/eslint-config-react-app#jest-rules for details
     - name: Install eslint-plugin-jest
       run: yarn add -D eslint-plugin-jest@^24.0.0 eslint-plugin-testing-library@^3.9.0
@@ -266,7 +269,7 @@ jobs:
         file_pattern: with-jest/
 
     ##
-    # PART 4: Add a sample test and run jest
+    # PART 3: Add a sample test and run jest
     #
     - name: Add a sample test
       run: cp -R with-jest-files/__tests__ with-jest/

@@ -1,9 +1,10 @@
 import { AppProps } from 'next/app';
+import { FunctionComponent } from 'react';
 
 import '../styles/globals.css';
 
-function MyApp({ Component, pageProps }: AppProps): JSX.Element {
+const MyApp: FunctionComponent<AppProps> = ({ Component, pageProps }) => {
   return <Component {...pageProps} />;
-}
+};
 
 export default MyApp;
