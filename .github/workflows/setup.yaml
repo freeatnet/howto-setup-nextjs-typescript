@@ -146,6 +146,7 @@ jobs:
           "lint": "eslint",
           "lint:fix": "eslint --fix",
           "lint:fix:all": "eslint --fix .",
+          "lint:precommit": "eslint --fix --max-warnings=0",
           "lint:ci": "eslint --max-warnings=0",
           "lint:ci:all": "eslint --max-warnings=0 ."
           }
