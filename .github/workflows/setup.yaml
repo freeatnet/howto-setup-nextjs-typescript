@@ -83,12 +83,6 @@ jobs:
         diff -y package.json{.bak,} || true
         rm package.json.bak
       working-directory: ./example-app
-    - name: Commit pre-commit type check hook
-      uses: stefanzweifel/git-auto-commit-action@v4
-      with:
-        commit_message: Trigger type check on pre-commit hook
-        branch: output
-        file_pattern: with-jest/
     - name: Commit our new app
       uses: stefanzweifel/git-auto-commit-action@v4
       with:
