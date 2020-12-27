@@ -83,10 +83,13 @@ jobs:
         diff -y package.json{.bak,} || true
         rm package.json.bak
       working-directory: ./example-app
+    - name: (docs skip) Get tag timestamp
+      run: echo "TAG_DATE=$(date +'%Y%m%d.%H%M')" >> $GITHUB_ENV
     - name: Commit our new app
       uses: stefanzweifel/git-auto-commit-action@v4
       with:
         commit_message: Set up our brand new shiny Next.js TypeScript app
+        tagging_message: 'with-typescript-${{ env.TAG_DATE }}'
 
         # Optional name of the branch the commit should be pushed to
         # Required if Action is used in Workflow listening to the `pull_request` event.
@@ -179,10 +182,13 @@ jobs:
     - name: Configure lint-staged to run yarn lint and type-check
       run: cp with-eslint-files/lint-staged.config.js with-eslint/
 
+    - name: (docs skip) Get tag timestamp
+      run: echo "TAG_DATE=$(date +'%Y%m%d.%H%M')" >> $GITHUB_ENV
     - name: Commit our changes
       uses: stefanzweifel/git-auto-commit-action@v4
       with:
         commit_message: Lint code with eslint
+        tagging_message: 'with-eslint-${{ env.TAG_DATE }}'
         branch: output
         file_pattern: with-eslint/
 
@@ -273,10 +279,13 @@ jobs:
     - name: Run jest!
       run: yarn jest
       working-directory: ./with-jest
+    - name: (docs skip) Get tag timestamp
+      run: echo "TAG_DATE=$(date +'%Y%m%d.%H%M')" >> $GITHUB_ENV
     - name: Commit sample test
       uses: stefanzweifel/git-auto-commit-action@v4
       with:
         commit_message: Add a sample test for home page
+        tagging_message: 'with-jest-${{ env.TAG_DATE }}'
         branch: output
         file_pattern: with-jest/
     
