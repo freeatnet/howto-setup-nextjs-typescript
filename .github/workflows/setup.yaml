@@ -62,7 +62,9 @@ jobs:
         cp tsconfig.json{,.bak}
         jq -s '.[0] * .[1]' -- tsconfig.json.bak - <<- NEW_SCRIPTS > tsconfig.json
         {
+          "compilerOptions": {
           "strict": true
+          }
         }
         NEW_SCRIPTS
         diff -y tsconfig.json{.bak,} || true
