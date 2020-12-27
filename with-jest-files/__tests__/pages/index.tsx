@@ -1,4 +1,4 @@
-import { within } from '@testing-library/dom';
+import { within } from '@testing-library/react';
 import { render, RenderResult } from '@testing-library/react';
 import * as React from 'react';
 
@@ -23,6 +23,9 @@ describe('<Home />', () => {
     const documentationText = getByText(/Documentation/);
     // Fair approximation, though looking up the tree may be more robust.
     const documentationParent = documentationText.parentElement;
+    if (!documentationParent) {
+      throw new Error('Failed to look up the parentElement');
+    }
 
     expect(documentationParent.tagName).toBe('A');
     expect(documentationParent.getAttribute('href')).toMatch(
