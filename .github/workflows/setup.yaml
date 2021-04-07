@@ -160,27 +160,17 @@ jobs:
       run: yarn lint:ci:all --max-warnings=0
       working-directory: ./with-eslint
 
-    - name: Install husky and lint-staged
-      run: yarn add -D husky lint-staged
-      working-directory: ./with-eslint
-    - name: Add husky config to package.json.
-      run: |-
-        cp package.json{,.bak}
-        jq -s '.[0] * .[1]' -- package.json.bak - <<- NEW_SCRIPTS > package.json
-        {
-          "husky": {
-            "hooks": {
-              "pre-commit": "lint-staged"
-            }
-          }
-        }
-        NEW_SCRIPTS
-        diff -y package.json{.bak,} || true
-        rm package.json.bak
+    - name: Set up husky (automatic install, see https://typicode.github.io/husky/#/?id=automatic-recommended)
+      run: npx husky-init && yarn
       working-directory: ./with-eslint
 
+    - name: Install lint-staged
+      run: yarn add -D lint-staged
+      working-directory: ./with-eslint
     - name: Configure lint-staged to run yarn lint and type-check
       run: cp with-eslint-files/lint-staged.config.js with-eslint/
+    - name: Add lint-staged to husky pre-commit hook
+      run: yarn husky add .husky/pre-commit "yarn lint-staged"
 
     - name: (docs skip) Get tag timestamp
       run: echo "TAG_DATE=$(date +'%Y%m%d.%H%M')" >> $GITHUB_ENV
