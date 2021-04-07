@@ -163,9 +163,17 @@ jobs:
     - name: Install husky (see https://typicode.github.io/husky/#/?id=automatic-recommended for specific instructions)
       run: |-
         yarn add -D husky@^6.0.0
+        # npm set-script prepare "husky install"
+        cp package.json{,.bak}
+        jq -s '.[0] * .[1]' -- package.json.bak - <<- NEW_SCRIPT > package.json
+        {
+          "prepare": "husky install"
+        }
+        NEW_SCRIPT
+        diff -y package.json{.bak,} || true
+        rm package.json.bak
         mkdir .husky && echo "_" > .husky/.gitignore
-        yarn husky add .husky/pre-commit "yarn lint-staged"
-        npm set-script prepare "husky install"
+        yarn husky set .husky/pre-commit "yarn lint-staged"
       working-directory: ./with-eslint
 
     - name: Install lint-staged
