@@ -162,6 +162,7 @@ jobs:
 
     - name: (docs skip) Link .git so that husky install can be run
       run: ln -s ../.git .git # Technincal
+      working-directory: ./with-eslint
     - name: Set up husky (automatic install, see https://typicode.github.io/husky/#/?id=automatic-recommended)
       run: npx husky-init && yarn
       working-directory: ./with-eslint
@@ -173,6 +174,7 @@ jobs:
       run: cp with-eslint-files/lint-staged.config.js with-eslint/
     - name: Add lint-staged to husky pre-commit hook
       run: yarn husky add .husky/pre-commit "yarn lint-staged"
+      working-directory: ./with-eslint
 
     - name: (docs skip) Get tag timestamp
       run: echo "TAG_DATE=$(date +'%Y%m%d.%H%M')" >> $GITHUB_ENV
