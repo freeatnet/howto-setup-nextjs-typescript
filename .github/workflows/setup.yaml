@@ -160,14 +160,13 @@ jobs:
       run: yarn lint:ci:all --max-warnings=0
       working-directory: ./with-eslint
 
-    - name: Set up husky (automatic install, see https://typicode.github.io/husky/#/?id=automatic-recommended)
-      run: npx husky-init
-    - name: (docs skip) Move husky files into the working dir & move in the config
+    - name: Install husky (see https://typicode.github.io/husky/#/?id=automatic-recommended for specific instructions)
       run: |-
         yarn add -D husky@^6.0.0
+        mkdir .husky && echo "_" > .husky/.gitignore
+        yarn husky add .husky/pre-commit "yarn lint-staged"
         npm set-script prepare "husky install"
-        cp -R .husky with-eslint/
-        sed -i 's/^npm test/yarn lint-staged/' with-eslint/.husky/pre-commit
+      working-directory: ./with-eslint
 
     - name: Install lint-staged
       run: yarn add -D lint-staged
