@@ -160,6 +160,8 @@ jobs:
       run: yarn lint:ci:all --max-warnings=0
       working-directory: ./with-eslint
 
+    - name: (docs skip) Link .git so that husky install can be run
+      run: ln -s ../.git .git # Technincal
     - name: Set up husky (automatic install, see https://typicode.github.io/husky/#/?id=automatic-recommended)
       run: npx husky-init && yarn
       working-directory: ./with-eslint
