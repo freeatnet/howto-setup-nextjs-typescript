@@ -167,13 +167,14 @@ jobs:
         cp package.json{,.bak}
         jq -s '.[0] * .[1]' -- package.json.bak - <<- NEW_SCRIPT > package.json
         {
-          "prepare": "husky install"
+          "scripts": {
+            "prepare": "husky install"
+          }
         }
         NEW_SCRIPT
         diff -y package.json{.bak,} || true
         rm package.json.bak
         mkdir .husky && echo "_" > .husky/.gitignore
-        yarn husky set .husky/pre-commit "yarn lint-staged"
       working-directory: ./with-eslint
 
     - name: Install lint-staged
@@ -182,7 +183,7 @@ jobs:
     - name: Configure lint-staged to run yarn lint and type-check
       run: cp with-eslint-files/lint-staged.config.js with-eslint/
     - name: Add lint-staged to husky pre-commit hook
-      run: echo "yarn lint-staged" >> 
+      run: yarn husky add .husky/pre-commit "yarn lint-staged"
       working-directory: ./with-eslint
 
     - name: (docs skip) Get tag timestamp
