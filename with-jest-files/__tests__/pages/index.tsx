@@ -1,5 +1,4 @@
-import { within } from '@testing-library/react';
-import { render, RenderResult } from '@testing-library/react';
+import { within, render, RenderResult } from '@testing-library/react';
 import * as React from 'react';
 
 import Home from '../../pages/index';
