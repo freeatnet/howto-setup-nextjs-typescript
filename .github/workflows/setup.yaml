@@ -57,13 +57,14 @@ jobs:
       working-directory: ./example-app
     - name: (docs skip) Remove technical file output.log
       run: rm example-app/output.log
-    - name: Enable TypeScript strict mode
+    - name: Enable TypeScript strict & incremental modes
       run: |-
         cp tsconfig.json{,.bak}
         jq -s '.[0] * .[1]' -- tsconfig.json.bak - <<- NEW_SCRIPTS > tsconfig.json
         {
           "compilerOptions": {
-          "strict": true
+          "strict": true,
+          "incremental": true
           }
         }
         NEW_SCRIPTS
