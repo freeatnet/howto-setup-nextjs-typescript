@@ -1,0 +1,49 @@
+{
+  "name": "example-app",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "check-types": "tsc --pretty --noEmit",
+    "lint:fix": "eslint --fix",
+    "lint:fix:all": "eslint --fix .",
+    "lint:precommit": "eslint --fix --max-warnings=0",
+    "lint:ci": "eslint --max-warnings=0",
+    "lint:ci:all": "eslint --max-warnings=0 .",
+    "prepare": "husky install || exit 0",
+    "test": "jest"
+  },
+  "dependencies": {
+    "next": "11.0.0",
+    "react": "17.0.2",
+    "react-dom": "17.0.2"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^5.14.1",
+    "@testing-library/react": "^11.2.7",
+    "@types/jest": "^26.0.23",
+    "@types/react": "^17.0.11",
+    "@types/testing-library__jest-dom": "^5.14.0",
+    "@typescript-eslint/eslint-plugin": "^4.0.0",
+    "@typescript-eslint/parser": "^4.0.0",
+    "babel-eslint": "^10.0.0",
+    "eslint": "^7.5.0",
+    "eslint-config-next": "11.0.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-config-react-app": "^6.0.0",
+    "eslint-plugin-flowtype": "^5.2.0",
+    "eslint-plugin-import": "^2.22.0",
+    "eslint-plugin-jsx-a11y": "^6.3.1",
+    "eslint-plugin-prettier": "^3.4.0",
+    "eslint-plugin-react": "^7.20.3",
+    "eslint-plugin-react-hooks": "^4.0.8",
+    "husky": "^6.0.0",
+    "jest": "^27.0.4",
+    "lint-staged": "^11.0.0",
+    "prettier": "^2.3.1",
+    "typescript": "^4.3.2"
+  }
+}
