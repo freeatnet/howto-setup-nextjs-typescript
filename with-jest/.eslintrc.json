@@ -2,6 +2,8 @@
   "extends": [
     "eslint:recommended",
     "react-app",
+    "react-app/jest",
+    "plugin:jest/style",
     "plugin:@typescript-eslint/recommended",
     "plugin:prettier/recommended"
   ],
@@ -36,5 +38,8 @@
         "newlines-between": "always"
       }
     ]
-  }
+  },
+  "plugins": [
+    "jest"
+  ]
 }
